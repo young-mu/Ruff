@@ -39,6 +39,16 @@ public class ServerSocketThread extends Thread {
                         msg.arg1 = 1;
                         msg.obj = (Object)command.substring(command.indexOf('[') + 1, command.indexOf(']'));
                         handler.sendMessage(msg);
+                    } else if (command.startsWith("Picture")) {
+                        Message msg = handler.obtainMessage();
+                        msg.arg1 = 2;
+                        msg.obj = (Object)command.substring(command.indexOf('[') + 1, command.indexOf(']'));
+                        handler.sendMessage(msg);
+                    } else if (command.startsWith("Video")) {
+                        Message msg = handler.obtainMessage();
+                        msg.arg1 = 3;
+                        msg.obj = (Object)command.substring(command.indexOf('[') + 1, command.indexOf(']'));
+                        handler.sendMessage(msg);
                     }
                 } catch (IOException e) {
                     e.printStackTrace();

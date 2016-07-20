@@ -44,9 +44,15 @@ public class MainActivity extends AppCompatActivity {
                             return true;
                         }
                     });
-                    String url = (String)msg.obj;
-                    Log.d(TAG, "load URL [" + url + "]");
-                    webView.loadUrl("file:///android_asset/" + url);
+                    String path = (String)msg.obj;
+                    Log.d(TAG, "load URL [" + path + "]");
+                    webView.loadUrl("file:///android_asset/" + path);
+                } else if (msg.arg1 == 2) {
+                    String path = (String)msg.obj;
+                    Log.d(TAG, "open Picture [" + path + "]");
+                } else if (msg.arg1 == 3) {
+                    String path = (String)msg.obj;
+                    Log.d(TAG, "play Video [" + path + "]");
                 }
             }
         };

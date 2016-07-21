@@ -1,5 +1,8 @@
 package com.young.ruff;
 
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
@@ -24,6 +27,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String ruffSdk = "ruff_sdk";
     private static final String ruffApp = "ruff_app";
+    private static final String ruffMm = "ruff_mm";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +38,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void handleMessage(Message msg) {
                 if (msg.arg1 == 1) {
+                    String path = (String)msg.obj;
+                    Log.d(TAG, "load URL [" + path + "]");
                     webView = (WebView)findViewById(R.id.webview);
                     webView.clearCache(true);
                     webView.getSettings().setJavaScriptEnabled(true);
@@ -44,15 +50,14 @@ public class MainActivity extends AppCompatActivity {
                             return true;
                         }
                     });
-                    String path = (String)msg.obj;
-                    Log.d(TAG, "load URL [" + path + "]");
                     webView.loadUrl("file:///android_asset/" + path);
                 } else if (msg.arg1 == 2) {
                     String path = (String)msg.obj;
                     Log.d(TAG, "open Picture [" + path + "]");
-                } else if (msg.arg1 == 3) {
-                    String path = (String)msg.obj;
-                    Log.d(TAG, "play Video [" + path + "]");
+                    Intent intent = new Intent();
+                    intent.setAction(Intent.ACTION_VIEW);
+                    intent.setDataAndType(Uri.parse("file:///mnt/sdcard/Pictures/" + path), "image/*");
+                    startActivity(intent);
                 }
             }
         };
@@ -68,6 +73,10 @@ public class MainActivity extends AppCompatActivity {
         // TODO: it's a workaround to put index.js in ruffSdk directory instead of ruffApp
         String ruffAppPath = AddMidSlash(this.getFilesDir().toString(), ruffSdk);
         copyAssetFiles(ruffApp, ruffAppPath);
+
+        String ruffMmPath = AddMidSlash(Environment.getExternalStoragePublicDirectory("Pictures").toString(), ruffMm);
+        Log.d(TAG, ruffMmPath);
+        copyAssetFiles(ruffMm, ruffMmPath);
 
         RuffThread ruffThread = new RuffThread(ruffBinPath, AddMidSlash(ruffAppPath, "index.js"));
         ruffThread.start();

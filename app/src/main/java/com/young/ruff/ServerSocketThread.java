@@ -34,7 +34,7 @@ public class ServerSocketThread extends Thread {
                 try {
                     BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                     String command = bufferedReader.readLine();
-                    if (command.startsWith("WebView")) {
+                    if (command.startsWith("Webview")) {
                         Message msg = handler.obtainMessage();
                         msg.arg1 = 1;
                         msg.obj = (Object)command.substring(command.indexOf('[') + 1, command.indexOf(']'));
@@ -42,11 +42,6 @@ public class ServerSocketThread extends Thread {
                     } else if (command.startsWith("Picture")) {
                         Message msg = handler.obtainMessage();
                         msg.arg1 = 2;
-                        msg.obj = (Object)command.substring(command.indexOf('[') + 1, command.indexOf(']'));
-                        handler.sendMessage(msg);
-                    } else if (command.startsWith("Video")) {
-                        Message msg = handler.obtainMessage();
-                        msg.arg1 = 3;
                         msg.obj = (Object)command.substring(command.indexOf('[') + 1, command.indexOf(']'));
                         handler.sendMessage(msg);
                     }

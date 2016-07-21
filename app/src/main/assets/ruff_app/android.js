@@ -39,7 +39,7 @@ Android.prototype.playAudio = function(path) {
     });
 };
 
-Android.prototype.playAudio = function(path) {
+Android.prototype.playVideo = function(path) {
     var client = net.connect(PORT_SEND, HOST, function() {
         client.write('Video [' + path + ']');
         client.end();

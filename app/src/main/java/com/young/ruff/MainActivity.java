@@ -21,25 +21,37 @@ public class MainActivity extends AppCompatActivity {
 
     private WebView webView;
     private Handler handler;
+
     private static final String TAG = "Ruff";
 
-    private static final int port = 2000;
+    private String ruffSdkRootPath;
+    private static final String ruffMmRootPath = Environment.getExternalStoragePublicDirectory("Ruff").toString();
+    private static final String ruffSdkRootUri = "file:///android_asset/";
+    private static final String ruffMmRootUri = "file:///mnt/sdcard/Ruff/";
 
     private static final String ruffSdk = "ruff_sdk";
     private static final String ruffApp = "ruff_app";
     private static final String ruffMm = "ruff_mm";
+
+    private String ruffSdkPath;
+    private String ruffAppPath;
+    private String ruffMmPath;
+
+    private String ruffBinPath;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        ruffSdkRootPath = this.getFilesDir().toString();
+
         handler = new Handler() {
             @Override
             public void handleMessage(Message msg) {
                 if (msg.arg1 == 1) {
                     String path = (String)msg.obj;
-                    Log.d(TAG, "load URL [" + path + "]");
+                    Log.d(TAG, "Load url [" + path + "]");
                     webView = (WebView)findViewById(R.id.webview);
                     webView.clearCache(true);
                     webView.getSettings().setJavaScriptEnabled(true);
@@ -50,13 +62,27 @@ public class MainActivity extends AppCompatActivity {
                             return true;
                         }
                     });
-                    webView.loadUrl("file:///android_asset/" + path);
+                    webView.loadUrl(ruffSdkRootUri + path);
                 } else if (msg.arg1 == 2) {
                     String path = (String)msg.obj;
-                    Log.d(TAG, "open Picture [" + path + "]");
+                    Log.d(TAG, "Open picture [" + path + "]");
                     Intent intent = new Intent();
                     intent.setAction(Intent.ACTION_VIEW);
-                    intent.setDataAndType(Uri.parse("file:///mnt/sdcard/Pictures/" + path), "image/*");
+                    intent.setDataAndType(Uri.parse(ruffMmRootUri + path), "image/*");
+                    startActivity(intent);
+                } else if (msg.arg1 == 3) {
+                    String path = (String) msg.obj;
+                    Log.d(TAG, "Play audio [" + path + "]");
+                    Intent intent = new Intent();
+                    intent.setAction(Intent.ACTION_VIEW);
+                    intent.setDataAndType(Uri.parse(ruffMmRootUri + path), "audio/*");
+                    startActivity(intent);
+                }  else if (msg.arg1 == 4) {
+                    String path = (String) msg.obj;
+                    Log.d(TAG, "Play video [" + path + "]");
+                    Intent intent = new Intent();
+                    intent.setAction(Intent.ACTION_VIEW);
+                    intent.setDataAndType(Uri.parse(ruffMmRootUri + path), "video/*");
                     startActivity(intent);
                 }
             }
@@ -65,17 +91,16 @@ public class MainActivity extends AppCompatActivity {
         ServerSocketThread serverSocketThread = new ServerSocketThread(handler);
         serverSocketThread.start();
 
-        String ruffSdkPath = AddMidSlash(this.getFilesDir().toString(), ruffSdk);
-        String ruffBinPath = AddMidSlash(ruffSdkPath, "ruff");
+        ruffSdkPath = AddMidSlash(ruffSdkRootPath, ruffSdk);
+        ruffBinPath = AddMidSlash(ruffSdkPath, "ruff");
         copyAssetFiles(ruffSdk, ruffSdkPath);
         new File(ruffBinPath).setExecutable(true);
 
         // TODO: it's a workaround to put index.js in ruffSdk directory instead of ruffApp
-        String ruffAppPath = AddMidSlash(this.getFilesDir().toString(), ruffSdk);
+        ruffAppPath = AddMidSlash(ruffSdkRootPath, ruffSdk);
         copyAssetFiles(ruffApp, ruffAppPath);
 
-        String ruffMmPath = AddMidSlash(Environment.getExternalStoragePublicDirectory("Pictures").toString(), ruffMm);
-        Log.d(TAG, ruffMmPath);
+        ruffMmPath = AddMidSlash(ruffMmRootPath, ruffMm);
         copyAssetFiles(ruffMm, ruffMmPath);
 
         RuffThread ruffThread = new RuffThread(ruffBinPath, AddMidSlash(ruffAppPath, "index.js"));

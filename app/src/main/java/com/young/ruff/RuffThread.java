@@ -7,7 +7,7 @@ import java.io.InputStreamReader;
 
 public class RuffThread extends Thread {
 
-    private final static String TAG = "Ruff";
+    private final static String TAG = "RuffThread";
 
     String ruffBinPath = null;
     String ruffAppPath = null;
@@ -28,7 +28,7 @@ public class RuffThread extends Thread {
             BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
             String line = "";
             while ((line = bufferedReader.readLine()) != null) {
-                Log.i(TAG, ">>> " + line);
+                Log.i(TAG, line);
             }
         } catch (Exception e) {
             e.printStackTrace();

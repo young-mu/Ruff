@@ -62,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
                             return true;
                         }
                     });
+                    webView.getSettings().setAllowUniversalAccessFromFileURLs(true);
                     webView.loadUrl(ruffSdkRootUri + path);
                 } else if (msg.arg1 == 2) {
                     String path = (String)msg.obj;

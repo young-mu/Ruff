@@ -12,7 +12,7 @@ import java.net.Socket;
 
 public class ServerSocketThread extends Thread {
 
-    private final static int port = 5678;
+    private final static int port = 8888;
     private final static String TAG = "Ruff";
 
     ServerSocket serverSocket;
@@ -37,12 +37,22 @@ public class ServerSocketThread extends Thread {
                     if (command.startsWith("Webview")) {
                         Message msg = handler.obtainMessage();
                         msg.arg1 = 1;
-                        msg.obj = (Object)command.substring(command.indexOf('[') + 1, command.indexOf(']'));
+                        msg.obj = command.substring(command.indexOf('[') + 1, command.indexOf(']'));
                         handler.sendMessage(msg);
                     } else if (command.startsWith("Picture")) {
                         Message msg = handler.obtainMessage();
                         msg.arg1 = 2;
-                        msg.obj = (Object)command.substring(command.indexOf('[') + 1, command.indexOf(']'));
+                        msg.obj = command.substring(command.indexOf('[') + 1, command.indexOf(']'));
+                        handler.sendMessage(msg);
+                    } else if (command.startsWith("Audio")) {
+                        Message msg = handler.obtainMessage();
+                        msg.arg1 = 3;
+                        msg.obj = command.substring(command.indexOf('[') + 1, command.indexOf(']'));
+                        handler.sendMessage(msg);
+                    } else if (command.startsWith("Video")) {
+                        Message msg = handler.obtainMessage();
+                        msg.arg1 = 4;
+                        msg.obj =  command.substring(command.indexOf('[') + 1, command.indexOf(']'));
                         handler.sendMessage(msg);
                     }
                 } catch (IOException e) {

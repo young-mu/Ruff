@@ -93,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
         serverSocketThread.start();
 
         ruffSdkPath = AddMidSlash(ruffSdkRootPath, ruffSdk);
-        ruffBinPath = AddMidSlash(ruffSdkPath, "ruff");
+        ruffBinPath = AddMidSlash(ruffSdkPath, "bin/ruff");
         copyAssetFiles(ruffSdk, ruffSdkPath);
         new File(ruffBinPath).setExecutable(true);
 

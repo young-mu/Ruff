@@ -124,7 +124,7 @@ exports.close = function (fd, req) {
     );
 };
 
-exports.write = function (fd, buffer, offset, req) {
+exports.write = function (fd, buffer, position, req) {
     return wrapDecisionCall(
         uv.fs_write,
         arguments,

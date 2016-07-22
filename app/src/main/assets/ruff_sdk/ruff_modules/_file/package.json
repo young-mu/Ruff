@@ -1,0 +1,7 @@
+{
+  "name": "_file",
+  "version": "0.0.9",
+  "description": "Dir & File module",
+  "author": "Ruff",
+  "main": "src/index.js"
+}

@@ -1,0 +1,7 @@
+{
+  "name": "ruff",
+  "version": "1.0.10",
+  "description": "Ruff core module",
+  "author": "Ruff",
+  "main": "src/index.js"
+}

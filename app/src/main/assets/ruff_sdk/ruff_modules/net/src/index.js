@@ -42,7 +42,7 @@ function isPipeName(s) {
     return typeof s === 'string' && toNumber(s) === false;
 }
 
-exports.createServer = function(options, connectionListener) {
+exports.createServer = function (options, connectionListener) {
     return new Server(options, connectionListener);
 };
 
@@ -59,7 +59,7 @@ exports.createServer = function(options, connectionListener) {
 // connect(port, [host], [cb])
 // connect(path, [cb]);
 //
-exports.connect = exports.createConnection = function() {
+exports.connect = exports.createConnection = function () {
     var argsLen = arguments.length;
     var args = new Array(argsLen);
     for (var i = 0; i < argsLen; i++)
@@ -246,7 +246,7 @@ function onSocketEnd() {
         this.readable = false;
         maybeDestroy(this);
     } else {
-        this.once('end', function() {
+        this.once('end', function () {
             this.readable = false;
             maybeDestroy(this);
         });
@@ -280,7 +280,7 @@ function writeAfterFIN(chunk, encoding, cb) {
 exports.Socket = Socket;
 exports.Stream = Socket; // Legacy naming.
 
-Socket.prototype.read = function(n) {
+Socket.prototype.read = function (n) {
     if (n === 0)
         return stream.Readable.prototype.read.call(this, n);
 
@@ -290,13 +290,13 @@ Socket.prototype.read = function(n) {
 };
 
 
-Socket.prototype.listen = function() {
+Socket.prototype.listen = function () {
     debug('socket.listen');
     this.on('connection', arguments[0]);
     listen(this, null, null, null);
 };
 
-Socket.prototype.setTimeout = function(msecs, callback) {
+Socket.prototype.setTimeout = function (msecs, callback) {
     var that = this;
 
     clearTimeout(this._timeoutTimer);
@@ -317,13 +317,13 @@ Socket.prototype.setTimeout = function(msecs, callback) {
 };
 
 
-Socket.prototype._onTimeout = function() {
+Socket.prototype._onTimeout = function () {
     debug('_onTimeout');
     this.emit('timeout');
 };
 
 
-Socket.prototype.setNoDelay = function(enable) {
+Socket.prototype.setNoDelay = function (enable) {
     var that = this;
 
     if (!this._handle) {
@@ -339,7 +339,7 @@ Socket.prototype.setNoDelay = function(enable) {
 };
 
 
-Socket.prototype.setKeepAlive = function(setting, msecs) {
+Socket.prototype.setKeepAlive = function (setting, msecs) {
     var that = this;
 
     if (!this._handle) {
@@ -354,20 +354,20 @@ Socket.prototype.setKeepAlive = function(setting, msecs) {
 };
 
 
-Socket.prototype.address = function() {
+Socket.prototype.address = function () {
     return this._getsockname();
 };
 
 
 Object.defineProperty(Socket.prototype, '_connecting', {
-    get: function() {
+    get: function () {
         return this.connecting;
     }
 });
 
 
 Object.defineProperty(Socket.prototype, 'readyState', {
-    get: function() {
+    get: function () {
         if (this.connecting) {
             return 'opening';
         } else if (this.readable && this.writable) {
@@ -384,7 +384,7 @@ Object.defineProperty(Socket.prototype, 'readyState', {
 
 
 Object.defineProperty(Socket.prototype, 'bufferSize', {
-    get: function() {
+    get: function () {
         if (this._handle) {
             return this._handle.writeQueueSize + this._writableState.length;
         }
@@ -393,7 +393,7 @@ Object.defineProperty(Socket.prototype, 'bufferSize', {
 
 
 // Just call handle.readStart until we have enough in the buffer
-Socket.prototype._read = function(n) {
+Socket.prototype._read = function (n) {
     debug('_read');
 
     var that = this;
@@ -414,7 +414,7 @@ Socket.prototype._read = function(n) {
 };
 
 
-Socket.prototype.end = function(data, encoding) {
+Socket.prototype.end = function (data, encoding) {
     stream.Duplex.prototype.end.call(this, data, encoding);
     this.writable = false;
     // DTRACE_NET_STREAM_END(this);
@@ -440,7 +440,7 @@ function maybeDestroy(socket) {
 }
 
 
-Socket.prototype.destroySoon = function() {
+Socket.prototype.destroySoon = function () {
     if (this.writable)
         this.end();
 
@@ -451,7 +451,7 @@ Socket.prototype.destroySoon = function() {
 };
 
 
-Socket.prototype._destroy = function(exception, cb) {
+Socket.prototype._destroy = function (exception, cb) {
     debug('destroy');
 
     function fireErrorCallbacks(self) {
@@ -512,7 +512,7 @@ Socket.prototype._destroy = function(exception, cb) {
 };
 
 
-Socket.prototype.destroy = function(exception) {
+Socket.prototype.destroy = function (exception) {
     debug('destroy', exception);
     this._destroy(exception);
 };
@@ -574,7 +574,7 @@ function onread(error, data) {
 }
 
 
-Socket.prototype._getpeername = function() {
+Socket.prototype._getpeername = function () {
     if (!this._peername) {
         if (!this._handle || !this._handle.getpeername) {
             return {};
@@ -603,7 +603,7 @@ protoGetter('bytesRead', function bytesRead() {
 });
 
 protoGetter('remoteAddress', function remoteAddress() {
-    return this._getpeername().address;
+    return this._getpeername().ip;
 });
 
 protoGetter('remoteFamily', function remoteFamily() {
@@ -615,7 +615,7 @@ protoGetter('remotePort', function remotePort() {
 });
 
 
-Socket.prototype._getsockname = function() {
+Socket.prototype._getsockname = function () {
     if (!this._handle || !this._handle.getsockname) {
         return {};
     }
@@ -641,7 +641,7 @@ protoGetter('localPort', function localPort() {
 });
 
 
-Socket.prototype.write = function(chunk, encoding, cb) {
+Socket.prototype.write = function (chunk, encoding, cb) {
     if (typeof chunk !== 'string' && !(chunk instanceof Buffer)) {
         throw new TypeError(
             'Invalid data, chunk must be a string or buffer, not ' + typeof chunk);
@@ -650,7 +650,7 @@ Socket.prototype.write = function(chunk, encoding, cb) {
 };
 
 
-Socket.prototype._write = function(data, encoding, cb) {
+Socket.prototype._write = function (data, encoding, cb) {
     var that = this;
 
     debug('_write');
@@ -661,7 +661,7 @@ Socket.prototype._write = function(data, encoding, cb) {
     if (this.connecting) {
         this._pendingData = data;
         this._pendingEncoding = encoding;
-        this.once('connect', function() {
+        this.once('connect', function () {
             this._write(data, encoding, cb);
         });
         return;
@@ -677,9 +677,9 @@ Socket.prototype._write = function(data, encoding, cb) {
     }
 
     if (encoding && typeof data === 'string') {
-        data = Duktape.Buffer(new Buffer(data, encoding));
+        data = util._toDuktapeBuffer(new Buffer(data, encoding));
     } else if (data instanceof Buffer) {
-        data = Duktape.Buffer(data);
+        data = util._toDuktapeBuffer(data);
     } else if (typeof data !== 'buffer') {
         throw new TypeError('Invalid data type');
     }
@@ -704,7 +704,7 @@ protoGetter('bytesWritten', function bytesWritten() {
     if (!state)
         return undefined;
 
-    state.getBuffer().forEach(function(el) {
+    state.getBuffer().forEach(function (el) {
         if (el.chunk instanceof Buffer)
             bytes += el.chunk.length;
         else
@@ -796,7 +796,7 @@ function connect(socket, address, port, addressType, localAddress, localPort) {
 }
 
 
-Socket.prototype.connect = function(options, cb) {
+Socket.prototype.connect = function (options, cb) {
     if (this.write !== Socket.prototype.write)
         this.write = Socket.prototype.write;
 
@@ -869,7 +869,7 @@ function lookupAndConnect(self, options) {
     // If host is an IP, skip performing a lookup
     var addressType = exports.isIP(host);
     if (addressType) {
-        process.nextTick(function() {
+        process.nextTick(function () {
             if (self.connecting)
                 connect(self, host, port, addressType, localAddress, localPort);
         });
@@ -892,7 +892,7 @@ function lookupAndConnect(self, options) {
     debug('connect: dns options', dnsopts);
     self._host = host;
     var lookup = options.lookup || dns.lookup;
-    lookup(host, dnsopts, function(err, ip, addressType) {
+    lookup(host, dnsopts, function (err, ip, addressType) {
         self.emit('lookup', err, ip, addressType, host);
 
         // It's possible we were destroyed while looking this up.
@@ -930,7 +930,7 @@ function connectErrorNT(self, err) {
 }
 
 
-Socket.prototype.ref = function() {
+Socket.prototype.ref = function () {
     if (!this._handle) {
         this.once('connect', this.ref);
         return this;
@@ -942,7 +942,7 @@ Socket.prototype.ref = function() {
 };
 
 
-Socket.prototype.unref = function() {
+Socket.prototype.unref = function () {
     if (!this._handle) {
         this.once('connect', this.unref);
         return this;
@@ -1110,7 +1110,7 @@ function createServerHandle(address, port, addressType, fd) {
 exports._createServerHandle = createServerHandle;
 
 
-Server.prototype._listen2 = function(address, port, addressType, backlog, fd) {
+Server.prototype._listen2 = function (address, port, addressType, backlog, fd) {
     debug('listen2', address, port, addressType, backlog, fd);
 
     // If there is not yet a handle, we need to create one and bind.
@@ -1218,7 +1218,7 @@ function listen(self, address, port, addressType, backlog, fd) {
 }
 
 
-Server.prototype.listen = function() {
+Server.prototype.listen = function () {
     var self = this;
 
     var lastArg = arguments[arguments.length - 1];
@@ -1284,7 +1284,7 @@ Server.prototype.listen = function() {
     }
 
     function listenAfterLookup(port, address, backlog, exclusive) {
-        require('dns').lookup(address, function(err, ip, addressType) {
+        require('dns').lookup(address, function (err, ip, addressType) {
             if (err) {
                 self.emit('error', err);
             } else {
@@ -1298,14 +1298,14 @@ Server.prototype.listen = function() {
 };
 
 Object.defineProperty(Server.prototype, 'listening', {
-    get: function() {
+    get: function () {
         return !!this._handle;
     },
     configurable: true,
     enumerable: true
 });
 
-Server.prototype.address = function() {
+Server.prototype.address = function () {
     if (this._handle && this._handle.getsockname) {
         return this._handle.getsockname();
     } else if (this._pipeName) {
@@ -1351,7 +1351,7 @@ function onconnection(err, clientHandle) {
 }
 
 
-Server.prototype.getConnections = function(cb) {
+Server.prototype.getConnections = function (cb) {
     function end(err, connections) {
         process.nextTick(cb, err, connections);
     }
@@ -1374,13 +1374,13 @@ Server.prototype.getConnections = function(cb) {
         if (--left === 0) return end(null, total);
     }
 
-    this._slaves.forEach(function(slave) {
+    this._slaves.forEach(function (slave) {
         slave.getConnections(oncount);
     });
 };
 
 
-Server.prototype.close = function(cb) {
+Server.prototype.close = function (cb) {
     function onSlaveClose() {
         if (--left !== 0) return;
 
@@ -1390,7 +1390,7 @@ Server.prototype.close = function(cb) {
 
     if (typeof cb === 'function') {
         if (!this._handle) {
-            this.once('close', function() {
+            this.once('close', function () {
                 cb(new Error('Not running'));
             });
         } else {
@@ -1412,7 +1412,7 @@ Server.prototype.close = function(cb) {
         this._connections++;
 
         // Poll slaves
-        this._slaves.forEach(function(slave) {
+        this._slaves.forEach(function (slave) {
             slave.close(onSlaveClose);
         });
     } else {
@@ -1422,7 +1422,7 @@ Server.prototype.close = function(cb) {
     return this;
 };
 
-Server.prototype._emitCloseIfDrained = function() {
+Server.prototype._emitCloseIfDrained = function () {
     debug('SERVER _emitCloseIfDrained');
 
     if (this._handle || this._connections) {
@@ -1441,16 +1441,16 @@ function emitCloseNT(self) {
 }
 
 
-Server.prototype.listenFD = util.deprecate(function(fd, type) {
+Server.prototype.listenFD = util.deprecate(function (fd, type) {
     return this.listen({ fd: fd });
 }, 'Server.listenFD is deprecated. Use Server.listen({fd: <number>}) instead.');
 
-Server.prototype._setupSlave = function(socketList) {
+Server.prototype._setupSlave = function (socketList) {
     this._usingSlaves = true;
     this._slaves.push(socketList);
 };
 
-Server.prototype.ref = function() {
+Server.prototype.ref = function () {
     this._unref = false;
 
     if (this._handle)
@@ -1459,7 +1459,7 @@ Server.prototype.ref = function() {
     return this;
 };
 
-Server.prototype.unref = function() {
+Server.prototype.unref = function () {
     this._unref = true;
 
     if (this._handle)
@@ -1469,7 +1469,7 @@ Server.prototype.unref = function() {
 };
 
 
-exports.isIP = function(input) {
+exports.isIP = function (input) {
     if (uv.is_ipv4(input)) {
         return 4;
     } else if (uv.is_ipv6(input)) {
@@ -1480,19 +1480,19 @@ exports.isIP = function(input) {
 };
 
 
-exports.isIPv4 = function(input) {
+exports.isIPv4 = function (input) {
     return uv.is_ipv4(input);
 };
 
 
-exports.isIPv6 = function(input) {
+exports.isIPv6 = function (input) {
     return uv.is_ipv6(input);
 };
 
 if (process.platform === 'win32') {
     var simultaneousAccepts;
 
-    exports._setSimultaneousAccepts = function(handle) {
+    exports._setSimultaneousAccepts = function (handle) {
         if (handle === undefined) {
             return;
         }
@@ -1508,5 +1508,5 @@ if (process.platform === 'win32') {
         }
     };
 } else {
-    exports._setSimultaneousAccepts = function(handle) {};
+    exports._setSimultaneousAccepts = function (handle) {};
 }

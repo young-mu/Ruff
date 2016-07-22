@@ -1,0 +1,7 @@
+{
+  "name": "kernal-module",
+  "version": "1.0.0",
+  "description": "The Kernal module",
+  "author": "Ruff",
+  "main": "src/index.js"
+}

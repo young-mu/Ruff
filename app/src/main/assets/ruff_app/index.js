@@ -20,5 +20,5 @@ android.on('button3', function() {
 
 //android.openPic('ruff_mm/Pictures/test1.jpg');
 //android.openPic('ruff_mm/Pictures/test2.jpg');
-//android.playAudio('ruff_mm/Audios/curiosity.mp3');
-android.playVideo('ruff_mm/Videos/test.mp4');
+android.playAudio('ruff_mm/Audios/curiosity.mp3');
+//android.playVideo('ruff_mm/Videos/test.mp4');

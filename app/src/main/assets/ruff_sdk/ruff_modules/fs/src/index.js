@@ -7,6 +7,8 @@
 'use strict';
 
 var pathModule = require('path');
+var util = require('util');
+
 var binding = require('./binding.js');
 var fsUtil = require('./util.js');
 
@@ -340,54 +342,111 @@ fs.close = function (fd, callback) {
 };
 
 // usage:
-//  fs.write(fd, buffer, [offset,] callback);
+//  fs.write(fd, buffer, offset, length[, position], callback);
 // OR
-//  fs.write(fd, string, [offset,] callback);
-fs.write = function (fd, buffer, offset, callback) {
-    // callback(err, written || 0, buffer);
-    if (typeof buffer !== 'string' && !(buffer instanceof Buffer)) {
-        throw new TypeError('invalid data');
+//  fs.write(fd, string[, position[, encoding]], callback);
+fs.write = function (fd, buffer, offset, length, position, callback) {
+    if (!(buffer instanceof Buffer) && typeof buffer !== 'string') {
+        buffer = String(buffer);
     }
 
-    if (buffer instanceof Buffer) {
-        buffer = buffer.toString();
+    if (typeof length === 'number') {
+        // fs.writeSync(fd, buffer, offset, length[, position], callback);
+        var end = offset + length;
+
+        if (typeof position === 'function') {
+            callback = position;
+            position = undefined;
+        }
+
+        if (typeof buffer === 'string') {
+            buffer = new Buffer(buffer);
+        }
+
+        buffer = buffer.slice(offset, end);
+    } else {
+        // fs.write(fd, string[, position[, encoding]], callback);
+        var encoding;
+
+        if (typeof offset === 'function') {
+            callback = offset;
+            position = undefined;
+        } else if (typeof length === 'function') {
+            callback = length;
+            position = offset;
+        } else {
+            callback = position;
+            position = offset;
+            encoding = length;
+        }
+
+        if (typeof buffer === 'string') {
+            buffer = new Buffer(buffer, encoding);
+        }
     }
 
-    if (typeof offset === 'function') {
-        callback = offset;
-        offset = 0;
-    }
+    callback = fsUtil.maybeCallback(callback);
 
-    return binding.write(fd, buffer, offset, { oncomplete: fsUtil.maybeCallback(callback) });
+    return binding.write(fd, util._toDuktapeBuffer(buffer), position || 0, {
+        oncomplete: oncomplete
+    });
+
+    function oncomplete(error, written) {
+        // Retain a reference to buffer so that it can't be GC'ed too soon.
+        callback(error, written || 0, buffer);
+    }
 };
 
-fs.writeSync = function (fd, buffer, offset) {
-    // callback(err, written || 0, buffer);
-    if (typeof buffer !== 'string' && !(buffer instanceof Buffer)) {
-        throw new TypeError('invalid data');
+// usage:
+//  fs.writeSync(fd, buffer, offset, length[, position]);
+// OR
+//  fs.writeSync(fd, string[, position[, encoding]]);
+fs.writeSync = function (fd, buffer, offset, length, position) {
+    if (!(buffer instanceof Buffer) && typeof buffer !== 'string') {
+        buffer = String(buffer);
     }
 
-    if (buffer instanceof Buffer) {
-        buffer = buffer.toString();
+    if (typeof length === 'number') {
+        // fs.writeSync(fd, buffer, offset, length[, position]);
+        var end = offset + length;
+
+        if (typeof buffer === 'string') {
+            buffer = new Buffer(buffer);
+        }
+
+        buffer = buffer.slice(offset, end);
+    } else {
+        // fs.write(fd, string[, position[, encoding]], callback);
+        position = offset; // args[2]
+        var encoding = length; // args[3]
+
+        if (typeof buffer === 'string') {
+            buffer = new Buffer(buffer, encoding);
+        }
     }
 
-    return binding.write(fd, buffer, offset || 0);
+    buffer = util._toDuktapeBuffer(buffer);
+
+    return binding.write(fd, buffer, position || 0);
 };
 
-function writeAll(fd, buffer, offset) {
-    var callback = fsUtil.maybeCallback(arguments[arguments.length - 1]);
-    fs.write(fd, buffer, offset, function (writeErr, written) {
-        if (writeErr) {
+function writeAll(fd, buffer, position, callback) {
+    fs.write(fd, buffer, position, function (error, written) {
+        if (error) {
             fs.close(fd, function () {
                 if (callback) {
-                    callback(writeErr);
+                    callback(error);
                 }
             });
-        } else if (written === buffer.length) {
+
+            return;
+        }
+
+        if (written === buffer.length) {
             fs.close(fd, callback);
         } else {
-            offset += written;
-            writeAll(fd, buffer.slice(written), offset, callback);
+            position += written;
+            writeAll(fd, buffer.slice(written), position, callback);
         }
     });
 }
@@ -399,8 +458,9 @@ fs.writeFile = function (path, data, options) {
 
     fs.open(path, options.flag || 'w', options.mode,
         fsUtil.callErrorWhenError(callback, function (openErr, fd) {
-            var buffer = data instanceof Buffer ? data : new Buffer(data,
-                options.encoding || 'utf8');
+            var buffer = data instanceof Buffer ?
+                data : new Buffer(data, options.encoding || 'utf8');
+
             writeAll(fd, buffer, 0, callback);
         }));
 };
@@ -416,11 +476,10 @@ fs.writeFileSync = function (path, data, options) {
 
     fsUtil.withCloseWhenError(fs, fd, function () {
         var offset = 0;
+
         while (data.length - offset > 0) {
-            var written = fs.writeSync(fd, data.slice(offset), offset);
-            offset += written;
+            offset += fs.writeSync(fd, data, offset);
         }
-        return offset;
     });
 };
 
@@ -431,8 +490,8 @@ fs.appendFile = function (path, data, options) {
     fs.open(path, options.flag || 'a', options.mode,
         fsUtil.callErrorWhenError(callback, function (openErr, fd) {
             fs.fstat(fd, fsUtil.callErrorWhenError(callback, function (statErr, stat) {
-                var buffer = data instanceof Buffer ? data : new Buffer(data,
-                    options.encoding || 'utf8');
+                var buffer = data instanceof Buffer ?
+                    data : new Buffer(String(data), options.encoding || 'utf8');
                 writeAll(fd, buffer, stat.size, callback);
             }));
         }));
@@ -450,8 +509,7 @@ fs.appendFileSync = function (path, data, options) {
         var offset = 0;
         var pos = getFileSize(fd);
         while (data.length - offset > 0) {
-            var written = fs.writeSync(fd, data.slice(offset), pos + offset);
-            offset += written;
+            offset += fs.writeSync(fd, data.slice(offset), pos + offset);
         }
         return offset;
     });

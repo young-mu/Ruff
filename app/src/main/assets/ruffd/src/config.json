@@ -1,0 +1,13 @@
+{
+    "minRapVersion": "0.9.1",
+    "deviceDataFileName": "device-data.json",
+    "server": {
+        "port": 7883
+    },
+    "discovery": {
+        "broadcast": {
+            "port": 7883,
+            "interval": 10000
+        }
+    }
+}

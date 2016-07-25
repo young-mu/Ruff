@@ -1,0 +1,19 @@
+{
+  "name": "ruffd",
+  "version": "1.3.0",
+  "description": "Ruff Daemon built for RuffOS",
+  "author": "Nanchao",
+  "devDependencies": {
+    "del": "^2.2.0",
+    "gulp": "^3.9.1",
+    "gulp-jscs": "^3.0.2",
+    "gulp-jshint": "^2.0.0",
+    "gulp-shell": "^0.5.2",
+    "gulp-util": "^3.0.7",
+    "gulp-zip": "^3.2.0",
+    "jshint": "^2.9.1"
+  },
+  "scripts": {
+    "gulp": "gulp"
+  }
+}

@@ -29,10 +29,12 @@ public class MainActivity extends AppCompatActivity {
     private static final String ruffSdkRootUri = "file:///android_asset/";
     private static final String ruffMmRootUri = "file:///mnt/sdcard/Ruff/";
 
+    private static final String ruffD = "ruffd";
     private static final String ruffSdk = "ruff_sdk";
     private static final String ruffApp = "ruff_app";
     private static final String ruffMm = "ruff_mm";
 
+    private String ruffDPath;
     private String ruffSdkPath;
     private String ruffAppPath;
     private String ruffMmPath;
@@ -91,6 +93,9 @@ public class MainActivity extends AppCompatActivity {
 
         ServerSocketThread serverSocketThread = new ServerSocketThread(handler);
         serverSocketThread.start();
+
+        ruffDPath = AddMidSlash(ruffSdkRootPath, ruffD);
+        copyAssetFiles(ruffD, ruffDPath);
 
         ruffSdkPath = AddMidSlash(ruffSdkRootPath, ruffSdk);
         ruffBinPath = AddMidSlash(ruffSdkPath, "bin/ruff");

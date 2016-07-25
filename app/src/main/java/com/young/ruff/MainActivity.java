@@ -97,8 +97,7 @@ public class MainActivity extends AppCompatActivity {
         copyAssetFiles(ruffSdk, ruffSdkPath);
         new File(ruffBinPath).setExecutable(true);
 
-        // TODO: it's a workaround to put index.js in ruffSdk directory instead of ruffApp
-        ruffAppPath = AddMidSlash(ruffSdkRootPath, ruffSdk);
+        ruffAppPath = AddMidSlash(ruffSdkRootPath, ruffApp);
         copyAssetFiles(ruffApp, ruffAppPath);
 
         ruffMmPath = AddMidSlash(ruffMmRootPath, ruffMm);

@@ -6,8 +6,10 @@
 'use strict';
 var path = require('path');
 
-var PID_FILE_PATH = '/var/run/ruff_app.pid';
-var APP_START_FIFO_PATH = '/tmp/ruff/app_start';
+var tmpPath = '/data/data/com.young.ruff/tmp/';
+
+var PID_FILE_PATH = tmpPath + 'ruff_app.pid';
+var APP_START_FIFO_PATH = tmpPath + 'app_start';
 
 function checkandKillAppInstance() {
     var mode = parseInt('666', 8);

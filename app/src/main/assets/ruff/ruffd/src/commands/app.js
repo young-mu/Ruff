@@ -183,12 +183,12 @@ exports.deploy = function (options, callback) {
 
     function extract() {
         var script = '\
-#!/bin/sh\n\
-rm -fr ' + app.path + '\n\
-mkdir -p ' + app.path + '\n\
+#!/system/bin/sh\n\
+/system/bin/rm -fr ' + app.path + '\n\
+/system/bin/mkdir -p ' + app.path + '\n\
 cd ' + app.path + '\n\
-tar -xf ' + app.deploymentPackagePath + '\n\
-sync\n\
+/system/bin/tar -xf ' + app.deploymentPackagePath + '\n\
+/system/bin/sync\n\
 ';
 
         fs.writeFile(EXTRACT_APP_SCRIPT_PATH, script, {

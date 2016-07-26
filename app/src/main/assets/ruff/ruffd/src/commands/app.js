@@ -6,7 +6,8 @@ var net = require('net');
 var app = require('../modules/app.js');
 var ExpectedError = require('../modules/error.js').ExpectedError;
 
-var EXTRACT_APP_SCRIPT_PATH = '/tmp/extract_app.sh';
+var tmpPath = '/data/data/com.young.ruff/tmp/';
+var EXTRACT_APP_SCRIPT_PATH = tmpPath + 'extract_app.sh';
 var DEFAULT_KILLING_TIMEOUT = 5000;
 
 var appLogFileHandle;
@@ -199,7 +200,7 @@ sync\n\
             }
 
             try {
-                uv.spawn(EXTRACT_APP_SCRIPT_PATH, [], '/tmp', -1, -1, -1, function (code) {
+                uv.spawn(EXTRACT_APP_SCRIPT_PATH, [], tmpPath, -1, -1, -1, function (code) {
                     if (code === 0) {
                         app.updateStatus('not-started');
                         callback();

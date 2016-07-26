@@ -11,19 +11,24 @@ public class RuffThread extends Thread {
 
     String ruffBinPath = null;
     String ruffAppPath = null;
+    String[] ruffEnvp = null;
     String ruffCmd = null;
 
-    public RuffThread(String ruffBinPath, String ruffAppPath) {
+    public RuffThread(String ruffBinPath, String ruffAppPath, String[] ruffEnvp) {
         this.ruffBinPath = ruffBinPath;
         this.ruffAppPath = ruffAppPath;
+        this.ruffEnvp = ruffEnvp;
         ruffCmd = this.ruffBinPath + " " + this.ruffAppPath;
         Log.d(TAG, "ruffCmd [" + ruffCmd + "]");
+        for (int i = 0; i < ruffEnvp.length; i++) {
+            Log.d(TAG, "ruffEnvp[" + i + "] = " + ruffEnvp[i]);
+        }
     }
 
     @Override
     public void run() {
         try {
-            Process process = Runtime.getRuntime().exec(this.ruffCmd);
+            Process process = Runtime.getRuntime().exec(this.ruffCmd, this.ruffEnvp);
             InputStreamReader inputStreamReader = new InputStreamReader(process.getInputStream());
             BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
             String line = "";

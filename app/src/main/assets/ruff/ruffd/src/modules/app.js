@@ -8,9 +8,11 @@ var SDK_PATH = process.env.RUFF_SDK_PATH;
 
 var app = new EventEmitter();
 
-app.deploymentPackagePath = '/tmp/app.tgz';
-app.logPath = '/tmp/ruff/ruffapp.log';
-app.startFifoPath = '/tmp/ruff/app_start';
+var tmpPath = '/data/data/com.young.ruff/tmp/';
+
+app.deploymentPackagePath = tmpPath + 'app.tgz';
+app.logPath = tmpPath + 'ruffapp.log';
+app.startFifoPath = tmpPath + 'app_start';
 app.path = process.env.RUFF_APP_PATH;
 app.packageFilePath = path.join(app.path, 'package.json');
 app.launcherPath = path.join(SDK_PATH, 'ruff_modules/launcher.js');

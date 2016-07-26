@@ -24,29 +24,48 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "Ruff";
 
-    private String ruffSdkRootPath;
-    private static final String ruffMmRootPath = Environment.getExternalStoragePublicDirectory("Ruff").toString();
-    private static final String ruffSdkRootUri = "file:///android_asset/";
-    private static final String ruffMmRootUri = "file:///mnt/sdcard/Ruff/";
-
-    private static final String ruffD = "ruffd";
-    private static final String ruffSdk = "ruff_sdk";
-    private static final String ruffApp = "ruff_app";
-    private static final String ruffMm = "ruff_mm";
-
+    private File ruffDir;
+    private String ruffPath;
     private String ruffDPath;
     private String ruffSdkPath;
     private String ruffAppPath;
+
+    private static final String ruffMmRootPath = Environment.getExternalStoragePublicDirectory("Ruff").toString();
+    private static final String ruffMm = "ruff_mm";
     private String ruffMmPath;
 
+    private static final String ruffSdkUri = "file:///android_asset/";
+    private static final String ruffMmUri = "file:///mnt/sdcard/Ruff/";
+
     private String ruffBinPath;
+    private String[] ruffEnvp;
+
+    private File tmpDir;
+    private String tmpPath;
+
+    public native void mkfifo(String path);
+
+    static {
+        System.loadLibrary("ruff");
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        ruffSdkRootPath = this.getFilesDir().toString();
+        ruffDir = new File("/data/data/" + this.getPackageName() + "/ruff");
+        ruffDir.mkdirs();
+        ruffPath = ruffDir.toString();
+        Log.i(TAG, "create direcotry [" + ruffPath + "]");
+
+        tmpDir = new File("/data/data/" + this.getPackageName() + "/tmp");
+        tmpDir.mkdirs();
+        tmpPath = tmpDir.toString();
+        Log.i(TAG, "create direcotry [" + tmpPath + "]");
+
+        mkfifo(AddMidSlash(tmpPath, "app_start"));
+        mkfifo(AddMidSlash(tmpPath, "ruffapp.log"));
 
         handler = new Handler() {
             @Override
@@ -65,27 +84,27 @@ public class MainActivity extends AppCompatActivity {
                         }
                     });
                     webView.getSettings().setAllowUniversalAccessFromFileURLs(true);
-                    webView.loadUrl(ruffSdkRootUri + path);
+                    webView.loadUrl(ruffSdkUri + path);
                 } else if (msg.arg1 == 2) {
                     String path = (String)msg.obj;
                     Log.d(TAG, "Open picture [" + path + "]");
                     Intent intent = new Intent();
                     intent.setAction(Intent.ACTION_VIEW);
-                    intent.setDataAndType(Uri.parse(ruffMmRootUri + path), "image/*");
+                    intent.setDataAndType(Uri.parse(ruffMmUri + path), "image/*");
                     startActivity(intent);
                 } else if (msg.arg1 == 3) {
                     String path = (String) msg.obj;
                     Log.d(TAG, "Play audio [" + path + "]");
                     Intent intent = new Intent();
                     intent.setAction(Intent.ACTION_VIEW);
-                    intent.setDataAndType(Uri.parse(ruffMmRootUri + path), "audio/*");
+                    intent.setDataAndType(Uri.parse(ruffMmUri + path), "audio/*");
                     startActivity(intent);
                 }  else if (msg.arg1 == 4) {
                     String path = (String) msg.obj;
                     Log.d(TAG, "Play video [" + path + "]");
                     Intent intent = new Intent();
                     intent.setAction(Intent.ACTION_VIEW);
-                    intent.setDataAndType(Uri.parse(ruffMmRootUri + path), "video/*");
+                    intent.setDataAndType(Uri.parse(ruffMmUri + path), "video/*");
                     startActivity(intent);
                 }
             }
@@ -94,21 +113,26 @@ public class MainActivity extends AppCompatActivity {
         ServerSocketThread serverSocketThread = new ServerSocketThread(handler);
         serverSocketThread.start();
 
-        ruffDPath = AddMidSlash(ruffSdkRootPath, ruffD);
-        copyAssetFiles(ruffD, ruffDPath);
+        ruffDPath = AddMidSlash(ruffPath, "ruffd");
+        copyAssetFiles("ruff/ruffd", ruffDPath);
 
-        ruffSdkPath = AddMidSlash(ruffSdkRootPath, ruffSdk);
+        ruffSdkPath = AddMidSlash(ruffPath, "sdk");
+        copyAssetFiles("ruff/sdk", ruffSdkPath);
+
         ruffBinPath = AddMidSlash(ruffSdkPath, "bin/ruff");
-        copyAssetFiles(ruffSdk, ruffSdkPath);
         new File(ruffBinPath).setExecutable(true);
 
-        ruffAppPath = AddMidSlash(ruffSdkRootPath, ruffApp);
-        copyAssetFiles(ruffApp, ruffAppPath);
+        ruffAppPath = AddMidSlash(ruffPath, "app");
+        copyAssetFiles("ruff/app", ruffAppPath);
 
         ruffMmPath = AddMidSlash(ruffMmRootPath, ruffMm);
         copyAssetFiles(ruffMm, ruffMmPath);
 
-        RuffThread ruffThread = new RuffThread(ruffBinPath, AddMidSlash(ruffAppPath, "index.js"));
+        ruffEnvp = new String[] { "RUFF_PATH=" + ruffPath,
+                                  "RUFFD_PATH=" + ruffDPath,
+                                  "RUFF_SDK_PATH=" + ruffSdkPath,
+                                  "RUFF_APP_PATH=" + ruffAppPath };
+        RuffThread ruffThread = new RuffThread(ruffBinPath, AddMidSlash(ruffDPath, "src/ruffd.js"), ruffEnvp);
         ruffThread.start();
     }
 

@@ -6,13 +6,13 @@ var app = require('./modules/app.js');
 var appCommands = require('./commands/app.js');
 var LogReader = require('./modules/log-reader.js');
 var server = require('./modules/server.js');
-var discovery = require('./modules/discovery.js');
+//var discovery = require('./modules/discovery.js');
 
 var logReader = new LogReader(app.logPath);
 
 server.setup(logReader);
 
-discovery.broadcast();
+//discovery.broadcast();
 
 if (app.status === 'not-started') {
     // TODO: move those to modules.

@@ -2,7 +2,6 @@ package com.young.ruff;
 
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
@@ -30,12 +29,8 @@ public class MainActivity extends AppCompatActivity {
     private String ruffSdkPath;
     private String ruffAppPath;
 
-    private static final String ruffMmRootPath = Environment.getExternalStoragePublicDirectory("Ruff").toString();
-    private static final String ruffMm = "ruff_mm";
-    private String ruffMmPath;
-
     private static final String ruffSdkUri = "file:///android_asset/";
-    private static final String ruffMmUri = "file:///mnt/sdcard/Ruff/";
+    private static final String ruffMmUri = "file:///mnt/sdcard/";
 
     private String ruffBinPath;
     private String[] ruffEnvp;
@@ -124,9 +119,6 @@ public class MainActivity extends AppCompatActivity {
 
         ruffAppPath = AddMidSlash(ruffPath, "app");
         copyAssetFiles("ruff/app", ruffAppPath);
-
-        ruffMmPath = AddMidSlash(ruffMmRootPath, ruffMm);
-        copyAssetFiles(ruffMm, ruffMmPath);
 
         ruffEnvp = new String[] { "RUFF_PATH=" + ruffPath,
                                   "RUFFD_PATH=" + ruffDPath,

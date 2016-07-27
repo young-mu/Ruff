@@ -1,0 +1,18 @@
+{
+    "models": [],
+    "inputs": {
+        "bus": {
+            "type": "number",
+            "args": {
+                "address": {
+                    "type": "number"
+                }
+            }
+        }
+    },
+    "outputs": {
+        "i2c": {
+            "type": "i2c"
+        }
+    }
+}

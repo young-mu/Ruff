@@ -1,0 +1,13 @@
+{
+    "models": [],
+    "inputs": {
+        "pin": {
+            "type": "number"
+        }
+    },
+    "outputs": {
+        "gpio": {
+            "type": "gpio"
+        }
+    }
+}

@@ -82,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
                     webView.loadUrl(ruffSdkUri + path);
                 } else if (msg.arg1 == 2) {
                     String path = (String)msg.obj;
-                    Log.d(TAG, "Open picture [" + path + "]");
+                    Log.d(TAG, "Show picture [" + path + "]");
                     Intent intent = new Intent();
                     intent.setAction(Intent.ACTION_VIEW);
                     intent.setDataAndType(Uri.parse(ruffMmUri + path), "image/*");

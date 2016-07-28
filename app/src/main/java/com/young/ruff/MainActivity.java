@@ -2,6 +2,8 @@ package com.young.ruff;
 
 import android.content.Intent;
 import android.net.Uri;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
@@ -15,6 +17,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -126,6 +129,22 @@ public class MainActivity extends AppCompatActivity {
                                   "RUFF_APP_PATH=" + ruffAppPath };
         RuffThread ruffThread = new RuffThread(ruffBinPath, AddMidSlash(ruffDPath, "src/ruffd.js"), ruffEnvp);
         ruffThread.start();
+
+        Log.d(TAG, "IP address [" + getIP() + "]");
+    }
+
+    private String getIP() {
+        try {
+            WifiManager wifiManager = (WifiManager) getSystemService(WIFI_SERVICE);
+            WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+            int ipAddress = wifiInfo.getIpAddress();
+            return String.format(Locale.getDefault(), "%d.%d.%d.%d",
+                    (ipAddress & 0xff), (ipAddress >> 8 & 0xff),
+                    (ipAddress >> 16 & 0xff), (ipAddress >> 24 & 0xff));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public void copyAssetFile(String assetFile, String outPath) {

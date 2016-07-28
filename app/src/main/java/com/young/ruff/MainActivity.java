@@ -130,7 +130,7 @@ public class MainActivity extends AppCompatActivity {
         RuffThread ruffThread = new RuffThread(ruffBinPath, AddMidSlash(ruffDPath, "src/ruffd.js"), ruffEnvp);
         ruffThread.start();
 
-        Log.d(TAG, "IP address [" + getIP() + "]");
+        Log.d(TAG, "Wifi IP address [" + getIP() + "]");
     }
 
     private String getIP() {

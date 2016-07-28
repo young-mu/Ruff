@@ -25,7 +25,7 @@ Android.prototype.loadUrl = function(path) {
     });
 };
 
-Android.prototype.openPic = function(path) {
+Android.prototype.showPic = function(path) {
     var client = net.connect(PORT_SEND, HOST, function() {
         client.write('Picture [' + path + ']');
         client.end();

@@ -13,15 +13,15 @@ var postData = function(data) {
 
 $(document).ready(function() {
 
-    $('#led-1').click(function() {
+    $('#button-1').click(function() {
         postData('1');
     });
 
-    $('#led-2').click(function() {
+    $('#button-2').click(function() {
         postData('2');
     });
 
-    $('#led-3').click(function() {
+    $('#button-3').click(function() {
         postData('3');
     });
 

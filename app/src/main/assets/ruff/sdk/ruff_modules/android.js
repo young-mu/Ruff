@@ -61,6 +61,8 @@ http.createServer(function(req, res) {
                 } else if (data.value === '3') {
                     android.emit('button3');
                 }
+                res.writeHead(200, {'Content-Type':'text/plain'});
+                res.end();
             });
         }
     }
